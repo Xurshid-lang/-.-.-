@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест по религиоведению</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#0f172a;
+  color:white;
+}
+
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+
+h1{margin-bottom:25px}
+
+.card{
+  background:#1e293b;
+  border-radius:18px;
+  padding:24px;
+  margin-bottom:20px;
+}
+
+.hidden{display:none!important}
+
+input{
+  width:100%;
+  padding:15px;
+  font-size:17px;
+  border-radius:10px;
+  border:none;
+  margin:15px 0;
+}
+
+button{
+  border:none;
+  border-radius:10px;
+  padding:14px;
+  background:#2563eb;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+button:hover{background:#1d4ed8}
+
+.layout{
+  display:grid;
+  grid-template-columns:1fr 260px;
+  gap:20px;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:20px;
+}
+
+.answer{
+  width:100%;
+  margin-top:12px;
+  background:#334155;
+  text-align:left;
+}
+
+.answer.selected-correct{background:#16a34a}
+.answer.selected-wrong{background:#dc2626}
+
+.nav{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+
+.nav button{width:100%}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+
+.num{
+  background:#334155;
+  padding:12px;
+  border-radius:8px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.num.active{background:#2563eb}
+.num.correct{background:#16a34a}
+.num.wrong{background:#dc2626}
+
+.result-main{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:20px;
+  text-align:center;
+}
+
+.big{
+  font-size:42px;
+  font-weight:bold;
+  color:#22c55e;
+}
+
+.result-layout{
+  display:grid;
+  grid-template-columns:1fr 280px;
+  gap:20px;
+}
+
+.item{
+  background:#111827;
+  padding:15px;
+  border-radius:12px;
+  margin-top:10px;
+}
+
+.green{color:#22c55e}
+.red{color:#ef4444}
+
+.legend{
+  margin-top:20px;
+  line-height:2;
+}
+
+@media(max-width:850px){
+  .layout,.result-layout,.result-main{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Тест по религиоведению</h1>
+
+<div class="card" id="loginBox">
+  <h2>Введите имя</h2>
+  <input id="studentName" placeholder="Ваше имя">
+  <button onclick="startQuiz()">Начать тест — 25 вопросов</button>
+</div>
+
+<div class="layout hidden" id="quizBox">
+
+  <div class="card">
+    <div class="top">
+      <div id="nameBox"></div>
+      <div id="timer">30:00</div>
+      <div id="progress"></div>
+    </div>
+
+    <h2 id="question"></h2>
+    <div id="answers"></div>
+
+    <div class="nav">
+      <button onclick="prevQuestion()">Назад</button>
+      <button onclick="nextQuestion()">Следующий</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Вопросы</h2>
+    <div class="grid" id="questionGrid"></div>
+  </div>
+
+</div>
+
+<div class="result-layout hidden" id="resultBox">
+
+  <div>
+
+    <div class="card">
+      <h2>Результат теста</h2>
+
+      <p id="resultName"></p>
+
+      <div class="result-main">
+        <div>
+          <p>Вы набрали</p>
+          <div class="big" id="scoreResult"></div>
+        </div>
+
+        <div>
+          <p>Процент</p>
+          <div class="big" id="percentResult"></div>
+        </div>
+
+        <div>
+          <p>Время</p>
+          <div class="big" id="timeResult"></div>
+        </div>
+      </div>
+
+      <hr>
+
+      <p class="green">Правильных ответов: <b id="correctCount"></b></p>
+      <p class="red">Неправильных ответов: <b id="wrongCount"></b></p>
+    </div>
+
+    <div class="card">
+      <h2 class="green">Правильные ответы</h2>
+      <div id="correctList"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="red">Неправильные ответы</h2>
+      <div id="wrongList"></div>
+    </div>
+
+  </div>
+
+  <div>
+
+    <div class="card">
+      <h2>Вопросы</h2>
+      <div class="grid" id="resultGrid"></div>
+
+      <div class="legend">
+        <div class="green">■ Правильно</div>
+        <div class="red">■ Неправильно</div>
+        <div style="color:#3b82f6">■ Текущий/последний</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Действия</h2>
+      <button style="width:100%" onclick="location.reload()">Пройти тест заново</button>
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+
+<script>
+let allQuestions = [];
+let questions = [];
+let current = 0;
+let userAnswers = [];
+let studentName = "";
+let timeLeft = 30 * 60;
+let timerInterval;
+let testStarted = false;
+
+fetch("questions.txt")
+.then(res => res.text())
+.then(text => {
+  let blocks = text.split("+++++");
+
+  blocks.forEach(block => {
+    let parts = block.split("=====")
+      .map(x => x.trim())
+      .filter(x => x.length > 0);
+
+    if(parts.length >= 5){
+      allQuestions.push({
+        question: parts[0],
+        answers: [parts[1], parts[2], parts[3], parts[4]],
+        correct: parts[1]
+      });
+    }
+  });
+});
+
+function startQuiz(){
+  studentName = document.getElementById("studentName").value.trim();
+
+  if(!studentName){
+    alert("Введите имя");
+    return;
+  }
+
+  if(allQuestions.length < 25){
+    alert("В questions.txt мало вопросов или файл не загрузился");
+    return;
+  }
+
+  questions = [...allQuestions]
+    .sort(() => Math.random() - 0.5)
+    .slice(0,25);
+
+  userAnswers = Array(25).fill(null);
+
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("quizBox").classList.remove("hidden");
+
+  document.getElementById("nameBox").innerText = "Имя: " + studentName;
+
+  createQuestionGrid();
+  showQuestion();
+  startTimer();
+}
+
+function startTimer(){
+  testStarted = true;
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+
+    let m = Math.floor(timeLeft / 60);
+    let s = timeLeft % 60;
+
+    document.getElementById("timer").innerText =
+      String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+
+    if(timeLeft <= 0){
+      finishQuiz();
+    }
+  },1000);
+}
+
+function createQuestionGrid(){
+  let html = "";
+
+  for(let i=0;i<25;i++){
+    html += `<div class="num" id="num${i}" onclick="goToQuestion(${i})">${i+1}</div>`;
+  }
+
+  document.getElementById("questionGrid").innerHTML = html;
+}
+
+function showQuestion(){
+  let q = questions[current];
+
+  document.getElementById("progress").innerText =
+    "Вопрос " + (current + 1) + "/25";
+
+  document.getElementById("question").innerText = q.question;
+
+  let mixed = q.answers
+    .map(a => ({ text:a, correct:a === q.correct }))
+    .sort(() => Math.random() - 0.5);
+
+  let html = "";
+
+  mixed.forEach(ans => {
+    let cls = "answer";
+
+    if(userAnswers[current] === ans.text){
+      cls += ans.correct ? " selected-correct" : " selected-wrong";
+    }
+
+    html += `
+      <button class="${cls}" onclick="chooseAnswer(\`${safe(ans.text)}\`)">
+        ${ans.text}
+      </button>
+    `;
+  });
+
+  document.getElementById("answers").innerHTML = html;
+
+  updateGrid();
+}
+
+function safe(text){
+  return text.replace(/`/g,"\\`").replace(/\\/g,"\\\\");
+}
+
+function chooseAnswer(answer){
+  userAnswers[current] = answer;
+  showQuestion();
+}
+
+function nextQuestion(){
+  if(current < 24){
+    current++;
+    showQuestion();
+  }else{
+    finishQuiz();
+  }
+}
+
+function prevQuestion(){
+  if(current > 0){
+    current--;
+    showQuestion();
+  }
+}
+
+function goToQuestion(index){
+  current = index;
+  showQuestion();
+}
+
+function updateGrid(){
+  for(let i=0;i<25;i++){
+    let el = document.getElementById("num"+i);
+    el.className = "num";
+
+    if(userAnswers[i]){
+      if(userAnswers[i] === questions[i].correct){
+        el.classList.add("correct");
+      }else{
+        el.classList.add("wrong");
+      }
+    }
+
+    if(i === current){
+      el.classList.add("active");
+    }
+  }
+}
+
+function finishQuiz(){
+  clearInterval(timerInterval);
+
+  document.getElementById("quizBox").classList.add("hidden");
+  document.getElementById("resultBox").classList.remove("hidden");
+
+  let correct = 0;
+  let correctHTML = "";
+  let wrongHTML = "";
+  let resultGridHTML = "";
+
+  questions.forEach((q,i) => {
+    let user = userAnswers[i];
+
+    if(user === q.correct){
+      correct++;
+
+      correctHTML += `
+        <div class="item">
+          <b>${i+1}. ${q.question}</b>
+          <p class="green">Ваш ответ: ${user}</p>
+          <p>Правильный ответ: <span class="green">${q.correct}</span></p>
+        </div>
+      `;
+
+      resultGridHTML += `<div class="num correct">${i+1}</div>`;
+    }else{
+      wrongHTML += `
+        <div class="item">
+          <b>${i+1}. ${q.question}</b>
+          <p class="red">Ваш ответ: ${user ? user : "Не отвечено"}</p>
+          <p>Правильный ответ: <span class="green">${q.correct}</span></p>
+        </div>
+      `;
+
+      resultGridHTML += `<div class="num wrong">${i+1}</div>`;
+    }
+  });
+
+  let wrong = 25 - correct;
+  let percent = Math.round((correct / 25) * 100);
+  let used = 30 * 60 - timeLeft;
+  let usedMin = Math.floor(used / 60);
+  let usedSec = used % 60;
+
+  document.getElementById("resultName").innerText =
+    "Имя: " + studentName;
+
+  document.getElementById("scoreResult").innerText =
+    correct + " из 25";
+
+  document.getElementById("percentResult").innerText =
+    percent + "%";
+
+  document.getElementById("timeResult").innerText =
+    String(usedMin).padStart(2,"0") + ":" + String(usedSec).padStart(2,"0");
+
+  document.getElementById("correctCount").innerText = correct;
+  document.getElementById("wrongCount").innerText = wrong;
+
+  document.getElementById("correctList").innerHTML =
+    correctHTML || "<p>Нет правильных ответов</p>";
+
+  document.getElementById("wrongList").innerHTML =
+    wrongHTML || "<p>Ошибок нет 🎉</p>";
+
+  document.getElementById("resultGrid").innerHTML = resultGridHTML;
+}
+</script>
+
+</body>
+</html>
