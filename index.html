@@ -16,7 +16,7 @@ body{
 }
 
 .container{
-  max-width:1400px;
+  max-width:900px;
   margin:auto;
   padding:20px;
 }
@@ -47,12 +47,6 @@ button:hover{background:#1d4ed8}
   margin-top:12px;
 }
 
-.quiz-layout{
-  display:grid;
-  grid-template-columns:1fr 280px;
-  gap:20px;
-}
-
 .top{
   display:flex;
   justify-content:space-between;
@@ -68,7 +62,11 @@ button:hover{background:#1d4ed8}
   padding:18px;
 }
 
+.answer:hover{background:#4b6384}
+
 .selected{background:#2563eb!important}
+.correct-answer{background:#16a34a!important}
+.wrong-answer{background:#dc2626!important}
 
 .nav{
   display:flex;
@@ -77,31 +75,6 @@ button:hover{background:#1d4ed8}
 }
 
 .nav button{width:100%}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:8px;
-}
-
-.num{
-  background:#3b4f6b;
-  padding:12px;
-  border-radius:8px;
-  text-align:center;
-  cursor:pointer;
-}
-
-.num.active{background:#2563eb}
-.num.answered{background:#64748b}
-.num.correct{background:#16a34a}
-.num.wrong{background:#dc2626}
-
-.result-layout{
-  display:grid;
-  grid-template-columns:1fr 300px;
-  gap:20px;
-}
 
 .result-box{
   background:#314866;
@@ -126,10 +99,8 @@ button:hover{background:#1d4ed8}
   text-align:center;
 }
 
-@media(max-width:900px){
-  .quiz-layout,.result-layout,.stats{
-    grid-template-columns:1fr;
-  }
+@media(max-width:700px){
+  .stats{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -150,79 +121,63 @@ button:hover{background:#1d4ed8}
   </div>
 </div>
 
-<div class="quiz-layout hidden" id="quizBox">
+<div class="card hidden" id="quizBox">
 
-  <div class="card">
-    <div class="top">
-      <div id="timer">30:00</div>
-      <div id="progress"></div>
-    </div>
-
-    <h2 id="question"></h2>
-    <div id="answers"></div>
-
-    <div class="nav">
-      <button onclick="prevQuestion()">Назад</button>
-      <button onclick="nextQuestion()">Следующий</button>
-    </div>
+  <div class="top">
+    <div id="timer">30:00</div>
+    <div id="progress"></div>
   </div>
 
-  <div class="card">
-    <h2>Вопросы</h2>
-    <div class="grid" id="questionGrid"></div>
+  <h2 id="question"></h2>
+  <div id="answers"></div>
+
+  <div class="nav">
+    <button onclick="prevQuestion()">Назад</button>
+    <button onclick="nextQuestion()">Следующий</button>
   </div>
 
 </div>
 
-<div class="result-layout hidden" id="resultBox">
+<div class="hidden" id="resultBox">
 
-  <div>
-    <div class="card">
-      <h2>Результат теста</h2>
+  <div class="card">
+    <h2>Результат теста</h2>
 
-      <div class="stats">
-        <div>
-          <p>Результат</p>
-          <div class="big" id="scoreText"></div>
-        </div>
-
-        <div>
-          <p>Процент</p>
-          <div class="big" id="percentText"></div>
-        </div>
-
-        <div>
-          <p>Время</p>
-          <div class="big" id="timeText"></div>
-        </div>
+    <div class="stats">
+      <div>
+        <p>Результат</p>
+        <div class="big" id="scoreText"></div>
       </div>
 
-      <hr>
+      <div>
+        <p>Процент</p>
+        <div class="big" id="percentText"></div>
+      </div>
 
-      <p class="green">Правильных ответов: <b id="correctCount"></b></p>
-      <p class="red">Неправильных ответов: <b id="wrongCount"></b></p>
+      <div>
+        <p>Время</p>
+        <div class="big" id="timeText"></div>
+      </div>
     </div>
 
-    <div class="card">
-      <h2 class="green">Правильные ответы</h2>
-      <div id="correctAnswers"></div>
-    </div>
+    <hr>
 
-    <div class="card">
-      <h2 class="red">Неправильные ответы</h2>
-      <div id="wrongAnswers"></div>
-    </div>
+    <p class="green">Правильных ответов: <b id="correctCount"></b></p>
+    <p class="red">Неправильных ответов: <b id="wrongCount"></b></p>
   </div>
 
-  <div>
-    <div class="card">
-      <h2>Вопросы</h2>
-      <div class="grid" id="resultGrid"></div>
-    </div>
+  <div class="card">
+    <h2 class="green">Правильные ответы</h2>
+    <div id="correctAnswers"></div>
+  </div>
 
-    <div class="card">
-      <button style="width:100%" onclick="location.reload()">Пройти заново</button>
-    </div>
+  <div class="card">
+    <h2 class="red">Неправильные ответы</h2>
+    <div id="wrongAnswers"></div>
+  </div>
+
+  <div class="card">
+    <button style="width:100%" onclick="location.reload()">Пройти заново</button>
   </div>
 
 </div>
@@ -234,6 +189,7 @@ let allQuestions = [];
 let questions = [];
 let current = 0;
 let userAnswers = [];
+let answered = [];
 let selectedCount = 25;
 let timeLeft = 30 * 60;
 let timerInterval;
@@ -285,11 +241,11 @@ function startQuiz(count){
     .slice(0,count);
 
   userAnswers = Array(count).fill(null);
+  answered = Array(count).fill(false);
 
   document.getElementById("startBox").classList.add("hidden");
   document.getElementById("quizBox").classList.remove("hidden");
 
-  createGrid();
   showQuestion();
   startTimer();
 }
@@ -310,20 +266,6 @@ function startTimer(){
   },1000);
 }
 
-function createGrid(){
-  let html = "";
-
-  for(let i = 0; i < selectedCount; i++){
-    html += `
-      <div class="num" id="num${i}" onclick="goQuestion(${i})">
-        ${i+1}
-      </div>
-    `;
-  }
-
-  document.getElementById("questionGrid").innerHTML = html;
-}
-
 function showQuestion(){
   let q = questions[current];
 
@@ -337,19 +279,28 @@ function showQuestion(){
   q.answers.forEach(answer => {
     let cls = "answer";
 
-    if(userAnswers[current] === answer){
-      cls += " selected";
+    if(answered[current]){
+      if(answer === q.correct){
+        cls += " correct-answer";
+      }
+
+      if(userAnswers[current] === answer && answer !== q.correct){
+        cls += " wrong-answer";
+      }
+    }else{
+      if(userAnswers[current] === answer){
+        cls += " selected";
+      }
     }
 
     html += `
-      <button class="${cls}" onclick="chooseAnswer(\`${safe(answer)}\`)">
+      <button class="${cls}" onclick="chooseAnswer(\`${safe(answer)}\`)" ${answered[current] ? "disabled" : ""}>
         ${answer}
       </button>
     `;
   });
 
   document.getElementById("answers").innerHTML = html;
-  updateGrid();
 }
 
 function safe(text){
@@ -359,7 +310,11 @@ function safe(text){
 }
 
 function chooseAnswer(answer){
+  if(answered[current]) return;
+
   userAnswers[current] = answer;
+  answered[current] = true;
+
   showQuestion();
 }
 
@@ -379,26 +334,6 @@ function prevQuestion(){
   }
 }
 
-function goQuestion(index){
-  current = index;
-  showQuestion();
-}
-
-function updateGrid(){
-  for(let i = 0; i < selectedCount; i++){
-    let el = document.getElementById("num"+i);
-    el.className = "num";
-
-    if(userAnswers[i]){
-      el.classList.add("answered");
-    }
-
-    if(i === current){
-      el.classList.add("active");
-    }
-  }
-}
-
 function finishQuiz(){
   clearInterval(timerInterval);
 
@@ -408,7 +343,6 @@ function finishQuiz(){
   let correct = 0;
   let correctHTML = "";
   let wrongHTML = "";
-  let gridHTML = "";
 
   questions.forEach((q,i) => {
     let user = userAnswers[i];
@@ -422,8 +356,6 @@ function finishQuiz(){
           <p class="green">Ваш ответ: ${user}</p>
         </div>
       `;
-
-      gridHTML += `<div class="num correct">${i+1}</div>`;
     }else{
       wrongHTML += `
         <div class="result-box">
@@ -432,8 +364,6 @@ function finishQuiz(){
           <p>Правильный ответ: <span class="green">${q.correct}</span></p>
         </div>
       `;
-
-      gridHTML += `<div class="num wrong">${i+1}</div>`;
     }
   });
 
@@ -460,8 +390,6 @@ function finishQuiz(){
 
   document.getElementById("wrongAnswers").innerHTML =
     wrongHTML || "<p>Ошибок нет 🎉</p>";
-
-  document.getElementById("resultGrid").innerHTML = gridHTML;
 }
 </script>
 
