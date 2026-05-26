@@ -3,56 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Religious Test</title>
+<title>Тест — Деньги и Банки</title>
 
 <style>
 
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
-  font-family:Arial;
-  background:#0f172a;
+  font-family:Arial,sans-serif;
+  background:#1b2a41;
   color:white;
 }
 
 .container{
-  max-width:900px;
+  max-width:1400px;
   margin:auto;
   padding:20px;
 }
 
+h1{
+  margin-bottom:20px;
+}
+
 .card{
-  background:#1e293b;
-  padding:25px;
+  background:#324a5f;
   border-radius:20px;
-  margin-top:20px;
-}
-
-button{
-  width:100%;
-  padding:15px;
-  margin-top:10px;
-  border:none;
-  border-radius:10px;
-  background:#334155;
-  color:white;
-  cursor:pointer;
-  font-size:16px;
-}
-
-button:hover{
-  background:#475569;
-}
-
-.correct{
-  background:green !important;
-}
-
-.wrong{
-  background:red !important;
+  padding:25px;
+  margin-bottom:20px;
 }
 
 .hidden{
-  display:none;
+  display:none!important;
+}
+
+input{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:12px;
+  font-size:18px;
+  margin:15px 0;
+}
+
+button{
+  border:none;
+  border-radius:12px;
+  padding:14px;
+  background:#2563eb;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#1d4ed8;
+}
+
+.quiz-layout{
+  display:grid;
+  grid-template-columns:1fr 280px;
+  gap:20px;
 }
 
 .top{
@@ -61,11 +74,109 @@ button:hover{
   margin-bottom:20px;
 }
 
-.result-item{
-  background:#111827;
+.answer{
+  width:100%;
+  margin-top:12px;
+  background:#4a6480;
+  text-align:left;
+  padding:18px;
+}
+
+.answer:hover{
+  background:#5a7694;
+}
+
+.selected{
+  background:#2563eb!important;
+}
+
+.nav{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+
+.nav button{
+  width:100%;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+
+.num{
+  background:#4a6480;
+  padding:12px;
+  border-radius:8px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.num.active{
+  background:#2563eb;
+}
+
+.num.answered{
+  background:#64748b;
+}
+
+.num.correct{
+  background:#16a34a;
+}
+
+.num.wrong{
+  background:#dc2626;
+}
+
+.result-layout{
+  display:grid;
+  grid-template-columns:1fr 300px;
+  gap:20px;
+}
+
+.result-box{
+  background:#415b76;
   padding:15px;
-  border-radius:10px;
-  margin-top:10px;
+  border-radius:12px;
+  margin-top:12px;
+}
+
+.green{
+  color:#22c55e;
+}
+
+.red{
+  color:#ef4444;
+}
+
+.big{
+  font-size:40px;
+  font-weight:bold;
+  color:#22c55e;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:20px;
+  text-align:center;
+}
+
+.legend{
+  margin-top:20px;
+  line-height:2;
+}
+
+@media(max-width:900px){
+
+.quiz-layout,
+.result-layout,
+.stats{
+  grid-template-columns:1fr;
+}
+
 }
 
 </style>
@@ -75,29 +186,43 @@ button:hover{
 
 <div class="container">
 
-<h1>Тест по религиоведению</h1>
+<h1>Тест — Деньги и Банки</h1>
 
-<div class="card" id="startBox">
+<div class="card" id="loginBox">
 
-<h2>Выберите количество вопросов</h2>
+<h2>Введите имя</h2>
 
-<button onclick="startQuiz(25)">25 вопросов</button>
-<button onclick="startQuiz(50)">50 вопросов</button>
-<button onclick="startQuiz(100)">100 вопросов</button>
-<button onclick="startQuiz(9999)">Все вопросы</button>
+<input id="studentName" placeholder="Ваше имя">
+
+<button onclick="startQuiz()">
+Начать тест — 25 вопросов
+</button>
 
 </div>
 
-<div class="card hidden" id="quizBox">
+<div class="quiz-layout hidden" id="quizBox">
+
+<div class="card">
 
 <div class="top">
+
+<div id="nameBox"></div>
+
+<div id="timer">30:00</div>
+
 <div id="progress"></div>
-<div id="score"></div>
+
 </div>
 
 <h2 id="question"></h2>
 
 <div id="answers"></div>
+
+<div class="nav">
+
+<button onclick="prevQuestion()">
+Назад
+</button>
 
 <button onclick="nextQuestion()">
 Следующий
@@ -105,15 +230,122 @@ button:hover{
 
 </div>
 
-<div class="card hidden" id="resultBox">
+</div>
 
-<h2>Результат</h2>
+<div class="card">
 
-<div id="finalScore"></div>
+<h2>Вопросы</h2>
 
-<h3>Ошибки:</h3>
+<div class="grid" id="questionGrid"></div>
 
-<div id="mistakes"></div>
+</div>
+
+</div>
+
+<div class="result-layout hidden" id="resultBox">
+
+<div>
+
+<div class="card">
+
+<h2>Результат теста</h2>
+
+<p id="resultName"></p>
+
+<div class="stats">
+
+<div>
+
+<p>Результат</p>
+
+<div class="big" id="scoreText"></div>
+
+</div>
+
+<div>
+
+<p>Процент</p>
+
+<div class="big" id="percentText"></div>
+
+</div>
+
+<div>
+
+<p>Время</p>
+
+<div class="big" id="timeText"></div>
+
+</div>
+
+</div>
+
+<hr>
+
+<p class="green">
+Правильных ответов:
+<b id="correctCount"></b>
+</p>
+
+<p class="red">
+Неправильных ответов:
+<b id="wrongCount"></b>
+</p>
+
+</div>
+
+<div class="card">
+
+<h2 class="green">
+Правильные ответы
+</h2>
+
+<div id="correctAnswers"></div>
+
+</div>
+
+<div class="card">
+
+<h2 class="red">
+Неправильные ответы
+</h2>
+
+<div id="wrongAnswers"></div>
+
+</div>
+
+</div>
+
+<div>
+
+<div class="card">
+
+<h2>Вопросы</h2>
+
+<div class="grid" id="resultGrid"></div>
+
+<div class="legend">
+
+<div class="green">■ Правильно</div>
+
+<div class="red">■ Неправильно</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<button style="width:100%"
+onclick="location.reload()">
+
+Пройти заново
+
+</button>
+
+</div>
+
+</div>
 
 </div>
 
@@ -123,39 +355,48 @@ button:hover{
 
 let allQuestions = [];
 let questions = [];
-
 let current = 0;
-let score = 0;
-let answered = false;
-
-let mistakes = [];
+let userAnswers = [];
+let studentName = "";
+let timeLeft = 30 * 60;
+let timerInterval;
 
 fetch("questions.txt")
-.then(r=>r.text())
-.then(text=>{
 
-const blocks = text.split("+++++");
+.then(r => r.text())
 
-blocks.forEach(block=>{
+.then(text => {
 
-let parts = block.split("=====")
-.map(x=>x.trim())
-.filter(x=>x);
+const blocks = text.split(/\+{4,}/);
+
+blocks.forEach(block => {
+
+let parts = block
+
+.split(/={5,}/)
+
+.map(x => x.trim())
+
+.filter(x => x && x !== "=");
 
 if(parts.length >= 5){
+
+let answers = [
+
+parts[1],
+parts[2],
+parts[3],
+parts[4]
+
+];
 
 allQuestions.push({
 
 question: parts[0],
 
-answers:[
-parts[1],
-parts[2],
-parts[3],
-parts[4]
-],
+correct: parts[1],
 
-correct:0
+answers: shuffleArray(answers)
 
 });
 
@@ -165,128 +406,243 @@ correct:0
 
 });
 
-function startQuiz(count){
+function shuffleArray(arr){
 
-questions =
-[...allQuestions]
-.sort(()=>Math.random()-0.5)
-.slice(0,count);
+return [...arr]
 
-current = 0;
-score = 0;
-mistakes = [];
-
-document.getElementById("startBox")
-.classList.add("hidden");
-
-document.getElementById("quizBox")
-.classList.remove("hidden");
-
-showQuestion();
+.sort(() => Math.random() - 0.5);
 
 }
 
-function showQuestion(){
+function startQuiz(){
 
-answered = false;
+studentName =
 
-let q = questions[current];
+document.getElementById("studentName")
+.value.trim();
 
-document.getElementById("progress").innerText =
-`Вопрос ${current+1}/${questions.length}`;
+if(!studentName){
 
-document.getElementById("score").innerText =
-`Правильно: ${score}`;
-
-document.getElementById("question").innerText =
-q.question;
-
-let mixed =
-q.answers.map((a,index)=>({
-
-text:a,
-correct:index===0
-
-})).sort(()=>Math.random()-0.5);
-
-let html = "";
-
-mixed.forEach(ans=>{
-
-html += `
-<button onclick="checkAnswer(this,'${ans.text}',${ans.correct})">
-${ans.text}
-</button>
-`;
-
-});
-
-document.getElementById("answers").innerHTML =
-html;
-
-}
-
-function checkAnswer(btn,text,isCorrect){
-
-if(answered) return;
-
-answered = true;
-
-if(isCorrect){
-
-btn.classList.add("correct");
-
-score++;
-
-}else{
-
-btn.classList.add("wrong");
-
-document.querySelectorAll("#answers button")
-.forEach(b=>{
-
-if(b.innerText === questions[current].answers[0]){
-
-b.classList.add("correct");
-
-}
-
-});
-
-mistakes.push({
-
-question:questions[current].question,
-
-your:text,
-
-correct:questions[current].answers[0]
-
-});
-
-}
-
-document.getElementById("score").innerText =
-`Правильно: ${score}`;
-
-}
-
-function nextQuestion(){
-
-current++;
-
-if(current >= questions.length){
-
-finishQuiz();
+alert("Введите имя");
 
 return;
 
 }
 
+if(allQuestions.length < 25){
+
+alert("В questions.txt мало вопросов");
+
+return;
+
+}
+
+questions = [...allQuestions]
+
+.sort(() => Math.random() - 0.5)
+
+.slice(0,25);
+
+userAnswers = Array(25).fill(null);
+
+document.getElementById("loginBox")
+.classList.add("hidden");
+
+document.getElementById("quizBox")
+.classList.remove("hidden");
+
+document.getElementById("nameBox")
+.innerText = "Имя: " + studentName;
+
+createGrid();
+
+showQuestion();
+
+startTimer();
+
+}
+
+function startTimer(){
+
+timerInterval = setInterval(() => {
+
+timeLeft--;
+
+let m = Math.floor(timeLeft / 60);
+
+let s = timeLeft % 60;
+
+document.getElementById("timer")
+.innerText =
+
+String(m).padStart(2,"0")
++ ":"
++ String(s).padStart(2,"0");
+
+if(timeLeft <= 0){
+
+finishQuiz();
+
+}
+
+},1000);
+
+}
+
+function createGrid(){
+
+let html = "";
+
+for(let i = 0; i < 25; i++){
+
+html += `
+
+<div class="num"
+id="num${i}"
+onclick="goQuestion(${i})">
+
+${i+1}
+
+</div>
+
+`;
+
+}
+
+document.getElementById("questionGrid")
+.innerHTML = html;
+
+}
+
+function showQuestion(){
+
+let q = questions[current];
+
+document.getElementById("progress")
+.innerText =
+
+"Вопрос "
++ (current + 1)
++ "/25";
+
+document.getElementById("question")
+.innerText = q.question;
+
+let html = "";
+
+q.answers.forEach(answer => {
+
+let cls = "answer";
+
+if(userAnswers[current] === answer){
+
+cls += " selected";
+
+}
+
+html += `
+
+<button
+class="${cls}"
+onclick="chooseAnswer(\`${safe(answer)}\`)">
+
+${answer}
+
+</button>
+
+`;
+
+});
+
+document.getElementById("answers")
+.innerHTML = html;
+
+updateGrid();
+
+}
+
+function safe(text){
+
+return text
+
+.replace(/\\/g,"\\\\")
+
+.replace(/`/g,"\\`");
+
+}
+
+function chooseAnswer(answer){
+
+userAnswers[current] = answer;
+
 showQuestion();
 
 }
 
+function nextQuestion(){
+
+if(current < 24){
+
+current++;
+
+showQuestion();
+
+}else{
+
+finishQuiz();
+
+}
+
+}
+
+function prevQuestion(){
+
+if(current > 0){
+
+current--;
+
+showQuestion();
+
+}
+
+}
+
+function goQuestion(index){
+
+current = index;
+
+showQuestion();
+
+}
+
+function updateGrid(){
+
+for(let i = 0; i < 25; i++){
+
+let el =
+document.getElementById("num"+i);
+
+el.className = "num";
+
+if(userAnswers[i]){
+
+el.classList.add("answered");
+
+}
+
+if(i === current){
+
+el.classList.add("active");
+
+}
+
+}
+
+}
+
 function finishQuiz(){
+
+clearInterval(timerInterval);
 
 document.getElementById("quizBox")
 .classList.add("hidden");
@@ -294,35 +650,131 @@ document.getElementById("quizBox")
 document.getElementById("resultBox")
 .classList.remove("hidden");
 
-document.getElementById("finalScore").innerHTML =
-`<h1>${score} / ${questions.length}</h1>`;
+let correct = 0;
 
-let html = "";
+let correctHTML = "";
 
-mistakes.forEach(m=>{
+let wrongHTML = "";
 
-html += `
+let gridHTML = "";
 
-<div class="result-item">
+questions.forEach((q,i) => {
 
-<p><b>Вопрос:</b> ${m.question}</p>
+let user = userAnswers[i];
 
-<p style="color:red">
-<b>Ваш ответ:</b> ${m.your}
-</p>
+if(user === q.correct){
 
-<p style="color:lightgreen">
-<b>Правильный:</b> ${m.correct}
+correct++;
+
+correctHTML += `
+
+<div class="result-box">
+
+<b>${i+1}. ${q.question}</b>
+
+<p class="green">
+Ваш ответ: ${user}
 </p>
 
 </div>
 
 `;
 
+gridHTML += `
+<div class="num correct">
+${i+1}
+</div>
+`;
+
+}else{
+
+wrongHTML += `
+
+<div class="result-box">
+
+<b>${i+1}. ${q.question}</b>
+
+<p class="red">
+
+Ваш ответ:
+${user ? user : "Не отвечено"}
+
+</p>
+
+<p>
+
+Правильный ответ:
+
+<span class="green">
+${q.correct}
+</span>
+
+</p>
+
+</div>
+
+`;
+
+gridHTML += `
+<div class="num wrong">
+${i+1}
+</div>
+`;
+
+}
+
 });
 
-document.getElementById("mistakes").innerHTML =
-html;
+let wrong = 25 - correct;
+
+let percent =
+Math.round(correct / 25 * 100);
+
+let used = 30 * 60 - timeLeft;
+
+let min = Math.floor(used / 60);
+
+let sec = used % 60;
+
+document.getElementById("resultName")
+.innerText =
+"Имя: " + studentName;
+
+document.getElementById("scoreText")
+.innerText =
+correct + " / 25";
+
+document.getElementById("percentText")
+.innerText =
+percent + "%";
+
+document.getElementById("timeText")
+.innerText =
+
+String(min).padStart(2,"0")
++ ":"
++ String(sec).padStart(2,"0");
+
+document.getElementById("correctCount")
+.innerText = correct;
+
+document.getElementById("wrongCount")
+.innerText = wrong;
+
+document.getElementById("correctAnswers")
+.innerHTML =
+
+correctHTML ||
+"<p>Нет правильных ответов</p>";
+
+document.getElementById("wrongAnswers")
+.innerHTML =
+
+wrongHTML ||
+"<p>Ошибок нет 🎉</p>";
+
+document.getElementById("resultGrid")
+.innerHTML = gridHTML;
 
 }
 
