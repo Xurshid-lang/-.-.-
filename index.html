@@ -11,22 +11,24 @@
 body{
   margin:0;
   font-family:Arial,sans-serif;
-  background:#1b2a41;
+  background:#16213e;
   color:white;
 }
 
-.container{max-width:1400px;margin:auto;padding:20px}
-.card{background:#324a5f;border-radius:20px;padding:25px;margin-bottom:20px}
-.hidden{display:none!important}
-
-input{
-  width:100%;
-  padding:15px;
-  border:none;
-  border-radius:12px;
-  font-size:18px;
-  margin:15px 0;
+.container{
+  max-width:1400px;
+  margin:auto;
+  padding:20px;
 }
+
+.card{
+  background:#243b5a;
+  border-radius:20px;
+  padding:25px;
+  margin-bottom:20px;
+}
+
+.hidden{display:none!important}
 
 button{
   border:none;
@@ -40,6 +42,11 @@ button{
 
 button:hover{background:#1d4ed8}
 
+.start-buttons button{
+  width:100%;
+  margin-top:12px;
+}
+
 .quiz-layout{
   display:grid;
   grid-template-columns:1fr 280px;
@@ -49,20 +56,19 @@ button:hover{background:#1d4ed8}
 .top{
   display:flex;
   justify-content:space-between;
+  gap:10px;
   margin-bottom:20px;
 }
 
 .answer{
   width:100%;
   margin-top:12px;
-  background:#4a6480;
+  background:#3b4f6b;
   text-align:left;
   padding:18px;
 }
 
 .selected{background:#2563eb!important}
-.correct-answer{background:#16a34a!important}
-.wrong-answer{background:#dc2626!important}
 
 .nav{
   display:flex;
@@ -79,7 +85,7 @@ button:hover{background:#1d4ed8}
 }
 
 .num{
-  background:#4a6480;
+  background:#3b4f6b;
   padding:12px;
   border-radius:8px;
   text-align:center;
@@ -98,7 +104,7 @@ button:hover{background:#1d4ed8}
 }
 
 .result-box{
-  background:#415b76;
+  background:#314866;
   padding:15px;
   border-radius:12px;
   margin-top:12px;
@@ -108,7 +114,7 @@ button:hover{background:#1d4ed8}
 .red{color:#ef4444}
 
 .big{
-  font-size:40px;
+  font-size:38px;
   font-weight:bold;
   color:#22c55e;
 }
@@ -121,7 +127,9 @@ button:hover{background:#1d4ed8}
 }
 
 @media(max-width:900px){
-  .quiz-layout,.result-layout,.stats{grid-template-columns:1fr}
+  .quiz-layout,.result-layout,.stats{
+    grid-template-columns:1fr;
+  }
 }
 </style>
 </head>
@@ -132,17 +140,20 @@ button:hover{background:#1d4ed8}
 
 <h1>Тест — Деньги и Банки</h1>
 
-<div class="card" id="loginBox">
-  <h2>Введите имя</h2>
-  <input id="studentName" placeholder="Ваше имя">
-  <button onclick="startQuiz()">Начать тест — 25 вопросов</button>
+<div class="card" id="startBox">
+  <h2>Выберите количество вопросов</h2>
+
+  <div class="start-buttons">
+    <button onclick="startQuiz(25)">25 вопросов</button>
+    <button onclick="startQuiz(50)">50 вопросов</button>
+    <button onclick="startQuiz(100)">100 вопросов</button>
+  </div>
 </div>
 
 <div class="quiz-layout hidden" id="quizBox">
 
   <div class="card">
     <div class="top">
-      <div id="nameBox"></div>
       <div id="timer">30:00</div>
       <div id="progress"></div>
     </div>
@@ -152,7 +163,7 @@ button:hover{background:#1d4ed8}
 
     <div class="nav">
       <button onclick="prevQuestion()">Назад</button>
-      <button id="nextBtn" onclick="nextQuestion()">Следующий</button>
+      <button onclick="nextQuestion()">Следующий</button>
     </div>
   </div>
 
@@ -168,12 +179,22 @@ button:hover{background:#1d4ed8}
   <div>
     <div class="card">
       <h2>Результат теста</h2>
-      <p id="resultName"></p>
 
       <div class="stats">
-        <div><p>Результат</p><div class="big" id="scoreText"></div></div>
-        <div><p>Процент</p><div class="big" id="percentText"></div></div>
-        <div><p>Время</p><div class="big" id="timeText"></div></div>
+        <div>
+          <p>Результат</p>
+          <div class="big" id="scoreText"></div>
+        </div>
+
+        <div>
+          <p>Процент</p>
+          <div class="big" id="percentText"></div>
+        </div>
+
+        <div>
+          <p>Время</p>
+          <div class="big" id="timeText"></div>
+        </div>
       </div>
 
       <hr>
@@ -213,24 +234,28 @@ let allQuestions = [];
 let questions = [];
 let current = 0;
 let userAnswers = [];
-let studentName = "";
+let selectedCount = 25;
 let timeLeft = 30 * 60;
 let timerInterval;
-let showingResult = false;
 
 fetch("questions.txt")
 .then(r => r.text())
 .then(text => {
-  const blocks = text.split(/\+{4,}/);
+  const blocks = text.split(/\+{3,}/);
 
   blocks.forEach(block => {
     let parts = block
-      .split(/={5,}/)
+      .split(/={3,}/)
       .map(x => x.trim())
       .filter(x => x && x !== "=");
 
     if(parts.length >= 5){
-      let answers = [parts[1], parts[2], parts[3], parts[4]];
+      let answers = [
+        parts[1],
+        parts[2],
+        parts[3],
+        parts[4]
+      ];
 
       allQuestions.push({
         question: parts[0],
@@ -245,25 +270,24 @@ function shuffleArray(arr){
   return [...arr].sort(() => Math.random() - 0.5);
 }
 
-function startQuiz(){
-  studentName = document.getElementById("studentName").value.trim();
-
-  if(!studentName){
-    alert("Введите имя");
+function startQuiz(count){
+  if(allQuestions.length < count){
+    alert("В questions.txt меньше вопросов, чем выбрано");
     return;
   }
 
-  if(allQuestions.length < 25){
-    alert("В questions.txt мало вопросов");
-    return;
-  }
+  selectedCount = count;
+  current = 0;
+  timeLeft = 30 * 60;
 
-  questions = [...allQuestions].sort(() => Math.random() - 0.5).slice(0,25);
-  userAnswers = Array(25).fill(null);
+  questions = [...allQuestions]
+    .sort(() => Math.random() - 0.5)
+    .slice(0,count);
 
-  document.getElementById("loginBox").classList.add("hidden");
+  userAnswers = Array(count).fill(null);
+
+  document.getElementById("startBox").classList.add("hidden");
   document.getElementById("quizBox").classList.remove("hidden");
-  document.getElementById("nameBox").innerText = "Имя: " + studentName;
 
   createGrid();
   showQuestion();
@@ -289,20 +313,22 @@ function startTimer(){
 function createGrid(){
   let html = "";
 
-  for(let i = 0; i < 25; i++){
-    html += `<div class="num" id="num${i}" onclick="goQuestion(${i})">${i+1}</div>`;
+  for(let i = 0; i < selectedCount; i++){
+    html += `
+      <div class="num" id="num${i}" onclick="goQuestion(${i})">
+        ${i+1}
+      </div>
+    `;
   }
 
   document.getElementById("questionGrid").innerHTML = html;
 }
 
 function showQuestion(){
-  showingResult = false;
-
   let q = questions[current];
 
   document.getElementById("progress").innerText =
-    "Вопрос " + (current + 1) + "/25";
+    "Вопрос " + (current + 1) + "/" + selectedCount;
 
   document.getElementById("question").innerText = q.question;
 
@@ -327,56 +353,18 @@ function showQuestion(){
 }
 
 function safe(text){
-  return text.replace(/\\/g,"\\\\").replace(/`/g,"\\`");
+  return text
+    .replace(/\\/g,"\\\\")
+    .replace(/`/g,"\\`");
 }
 
 function chooseAnswer(answer){
-  if(showingResult) return;
   userAnswers[current] = answer;
   showQuestion();
 }
 
 function nextQuestion(){
-  if(!userAnswers[current]){
-    alert("Выберите ответ");
-    return;
-  }
-
-  if(!showingResult){
-    showAnswerResult();
-
-    setTimeout(() => {
-      moveNext();
-    }, 900);
-
-    return;
-  }
-
-  moveNext();
-}
-
-function showAnswerResult(){
-  showingResult = true;
-
-  let buttons = document.querySelectorAll(".answer");
-  let q = questions[current];
-  let user = userAnswers[current];
-
-  buttons.forEach(btn => {
-    if(btn.innerText.trim() === q.correct.trim()){
-      btn.classList.add("correct-answer");
-    }
-
-    if(btn.innerText.trim() === user.trim() && user !== q.correct){
-      btn.classList.add("wrong-answer");
-    }
-
-    btn.disabled = true;
-  });
-}
-
-function moveNext(){
-  if(current < 24){
+  if(current < selectedCount - 1){
     current++;
     showQuestion();
   }else{
@@ -397,7 +385,7 @@ function goQuestion(index){
 }
 
 function updateGrid(){
-  for(let i = 0; i < 25; i++){
+  for(let i = 0; i < selectedCount; i++){
     let el = document.getElementById("num"+i);
     el.className = "num";
 
@@ -449,15 +437,18 @@ function finishQuiz(){
     }
   });
 
-  let wrong = 25 - correct;
-  let percent = Math.round(correct / 25 * 100);
+  let wrong = selectedCount - correct;
+  let percent = Math.round(correct / selectedCount * 100);
   let used = 30 * 60 - timeLeft;
   let min = Math.floor(used / 60);
   let sec = used % 60;
 
-  document.getElementById("resultName").innerText = "Имя: " + studentName;
-  document.getElementById("scoreText").innerText = correct + " / 25";
-  document.getElementById("percentText").innerText = percent + "%";
+  document.getElementById("scoreText").innerText =
+    correct + " / " + selectedCount;
+
+  document.getElementById("percentText").innerText =
+    percent + "%";
+
   document.getElementById("timeText").innerText =
     String(min).padStart(2,"0") + ":" + String(sec).padStart(2,"0");
 
