@@ -12,23 +12,16 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 body{margin:0;min-height:100%;color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:radial-gradient(800px 520px at 6% -8%,var(--g1),transparent 60%),radial-gradient(760px 520px at 102% 2%,var(--g2),transparent 58%),radial-gradient(700px 480px at 50% 112%,var(--g3),transparent 60%),var(--bg);background-attachment:fixed}
 main{max-width:760px;margin:0 auto;padding:28px 16px 56px}
-h1{font-size:1.75rem;line-height:1.2;margin:0 0 18px;letter-spacing:-.02em;font-weight:750}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 18px;letter-spacing:-.02em;font-weight:750}
 h2{font-size:1.15rem;margin:26px 0 10px;font-weight:700}
 .card{background:color-mix(in srgb,var(--card) 80%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid color-mix(in srgb,var(--line) 75%,transparent);border-radius:18px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow)}
-button,input,textarea,select{font:inherit;color:var(--ink)}
-button{cursor:pointer;border-radius:12px;border:1px solid var(--line);background:color-mix(in srgb,var(--card) 88%,transparent);padding:11px 18px;transition:transform .12s,box-shadow .12s,border-color .12s}
+button{font:inherit;color:var(--ink);cursor:pointer;border-radius:12px;border:1px solid var(--line);background:color-mix(in srgb,var(--card) 88%,transparent);padding:11px 18px;transition:transform .12s,box-shadow .12s,border-color .12s}
 button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.10);border-color:var(--acc)}
-button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 button.primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:700}
-button.danger{color:var(--bad)}
+button.big{width:100%;padding:15px 18px;font-size:1.1rem}
 button:disabled{opacity:.4;cursor:not-allowed}
-input,textarea,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--bg) 70%,var(--card));margin:6px 0 12px}
-textarea{min-height:260px;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace}
-label{font-weight:600}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.row.sp{justify-content:space-between}
 .hint{color:var(--mute);font-size:.92rem}
-.warn{background:var(--badbg);border-radius:12px;padding:10px 14px;font-size:.92rem;margin-bottom:16px}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 16px}
 .chips span{background:var(--sel);border-radius:999px;padding:6px 14px;font-size:.92rem;font-weight:600}
 .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;color:var(--mute)}
@@ -49,116 +42,36 @@ label{font-weight:600}
 .item{border-left:4px solid var(--line);padding:9px 14px;margin-bottom:10px;border-radius:0 12px 12px 0}
 .item.ok{border-color:var(--ok);background:var(--okbg)}.item.bad{border-color:var(--bad);background:var(--badbg)}
 .item p{margin:0 0 4px}.item small{display:block;color:var(--mute)}
-.scroll{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:620px}
-th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}
-td.ok{color:var(--ok);font-weight:700}td.bad{color:var(--bad);font-weight:700}
-.list button{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;margin-bottom:10px;padding:16px 18px;font-weight:650}
-.list button small{font-weight:500;color:var(--mute);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <main id="app"></main>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-// ===== НАСТРОЙКИ (заполните по инструкции из README) =====
-const FIREBASE_CONFIG={apiKey:'ВСТАВЬТЕ',authDomain:'',projectId:'',appId:''};
-const ADMIN_EMAIL='admin@example.com'; // e-mail админа, созданный в Firebase Authentication
-const ADMIN_PIN='1234';                // только для локального режима без Firebase
-const MAX_MISTAKES=3, QCOUNT=25, LIMIT=30*60; // 25 вопросов, 30 минут
-const DEFAULT={id:'default',title:'Тест из questions.txt',builtin:true,questions:[]};
+const TITLE='Деньги и Банки', MAX_MISTAKES=3, QCOUNT=25, LIMIT=30*60; // 25 вопросов, 30 минут
 
 const $=id=>document.getElementById(id);
-const h=(t,p,...k)=>{const e=document.createElement(t);for(const x in (p||{})){if(x==='class')e.className=p[x];else if(x.startsWith('on'))e[x]=p[x];else if(x==='value')e.value=p[x];else e.setAttribute(x,p[x])}k.flat().forEach(c=>{if(c!=null)e.append(c)});return e};
+const h=(t,p,...k)=>{const e=document.createElement(t);for(const x in (p||{})){if(x==='class')e.className=p[x];else if(x.startsWith('on'))e[x]=p[x];else e.setAttribute(x,p[x])}k.flat().forEach(c=>{if(c!=null)e.append(c)});return e};
 const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};
-const uid=()=>'t'+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36);
+const mount=(...n)=>{$('app').replaceChildren(...n.flat().filter(Boolean));window.scrollTo(0,0)};
 
-// ---------- хранилище: Firebase Firestore или localStorage ----------
-let fb=null,auth=null,admin=false,unsubRes=null;
-const cache={tests:[],results:[]};
-const LS=k=>{try{return JSON.parse(localStorage.getItem(k)||'[]')}catch(e){return[]}};
-const LSset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-cache.tests=LS('tests');cache.results=LS('results');
-async function save(col,id,data){
-  if(fb){if(col==='results')await fb.collection('results').add(data);else await fb.collection(col).doc(id).set(data);return}
-  const a=cache[col].filter(x=>x.id!==id);a.push({id,...data});cache[col]=a;LSset(col,a);route();
-}
-async function remove(col,id){
-  if(fb){await fb.collection(col).doc(id).delete();return}
-  cache[col]=cache[col].filter(x=>x.id!==id);LSset(col,cache[col]);route();
-}
-function watchResults(){
-  if(!fb||unsubRes)return;
-  unsubRes=fb.collection('results').onSnapshot(s=>{cache.results=s.docs.map(d=>({id:d.id,...d.data()}));route()},()=>{unsubRes=null});
-}
-function initDb(){
-  if(!window.firebase||!FIREBASE_CONFIG.apiKey||FIREBASE_CONFIG.apiKey.startsWith('ВСТАВЬТЕ'))return;
-  try{
-    firebase.initializeApp(FIREBASE_CONFIG);fb=firebase.firestore();auth=firebase.auth();
-    cache.tests=[];cache.results=[];
-    fb.collection('tests').onSnapshot(s=>{cache.tests=s.docs.map(d=>({id:d.id,...d.data()}));route()},()=>{});
-    auth.onAuthStateChanged(u=>{admin=!!u&&u.email===ADMIN_EMAIL;if(admin)watchResults()});
-  }catch(e){fb=null}
-}
-const allTests=()=>[...(DEFAULT.questions.length?[DEFAULT]:[]),...cache.tests];
-const findTest=id=>allTests().find(t=>t.id===id);
+let bank=[],loaded=false,quiz=null,timer=null;
 
-// ---------- маршруты ----------
-let quiz=null,timer=null;
-function route(){
-  if(quiz&&quiz.active)return;
-  const hash=location.hash.slice(1);
-  if(hash==='admin'&&admin)return viewAdmin();
-  if(hash.startsWith('test-')){const t=findTest(hash.slice(5));if(t)return viewStart(t)}
-  viewHome();
-}
-window.addEventListener('hashchange',()=>{if(quiz&&quiz.active)return;route()});
-const mount=(...n)=>{const a=$('app');a.replaceChildren(...n.flat().filter(Boolean));window.scrollTo(0,0)};
-const modeNote=()=>fb?null:h('div',{class:'warn'},'Firebase не подключён: тесты и результаты сохраняются только на этом устройстве. Подключите Firebase (см. README), чтобы админ видел результаты всех студентов.');
-
-async function enterAdmin(){
-  if(!fb){if(prompt('PIN администратора')!==ADMIN_PIN)return;admin=true;location.hash='admin';return route()}
-  if(admin){location.hash='admin';return route()}
-  viewLogin();
-}
-function viewLogin(){
-  const em=h('input',{type:'email',placeholder:'E-mail админа',autocomplete:'username'}),pw=h('input',{type:'password',placeholder:'Пароль',autocomplete:'current-password'}),msg=h('p',{class:'hint'});
-  mount(h('h1',{},'Вход для админа'),h('div',{class:'card'},em,pw,msg,h('div',{class:'row'},
-    h('button',{class:'primary',onclick:async()=>{
-      try{const c=await auth.signInWithEmailAndPassword(em.value.trim(),pw.value);
-        if(c.user.email!==ADMIN_EMAIL){await auth.signOut();throw new Error('Это не админ-аккаунт')}
-        admin=true;watchResults();location.hash='admin';route()}
-      catch(e){msg.textContent='Не удалось войти: '+(e.message||e.code);msg.style.color='var(--bad)'}}},'Войти'),
-    h('button',{onclick:()=>{location.hash='';route()}},'Отмена'))));
-}
-
-// ---------- главная ----------
-function viewHome(){
-  mount(h('h1',{},'Тесты'),modeNote(),
-    allTests().length?null:h('p',{class:'hint'},'Тестов пока нет. Войдите в админ-профиль и создайте первую страницу с вопросами.'),
-    h('div',{class:'list'},allTests().map(t=>h('button',{onclick:()=>{location.hash='test-'+t.id}},h('span',{},t.title),h('small',{},Math.min(QCOUNT,t.questions.length)+' вопросов, 30 минут')))),
-    h('p',{},h('button',{class:'primary',onclick:enterAdmin},'Админ-профиль')));
-}
-
-// ---------- старт теста ----------
-function viewStart(t){
-  const inp=h('input',{placeholder:'Фамилия и имя',maxlength:'60',value:localStorage.getItem('sname')||''});
-  const n=Math.min(QCOUNT,t.questions.length);
-  mount(h('h1',{},t.title),modeNote(),h('div',{class:'card'},
+// ---------- старт ----------
+function viewStart(){
+  if(!loaded)return mount(h('h1',{},TITLE),h('p',{class:'hint'},'Загружаю вопросы…'));
+  if(!bank.length)return mount(h('h1',{},TITLE),h('div',{class:'card'},h('p',{},'Не удалось загрузить вопросы. Проверьте, что файл questions.txt лежит рядом с index.html.')));
+  const n=Math.min(QCOUNT,bank.length);
+  mount(h('h1',{},TITLE),h('div',{class:'card'},
     h('div',{class:'chips'},h('span',{},n+' вопросов'),h('span',{},'30 минут'),h('span',{},'не более '+MAX_MISTAKES+' ошибок')),
-    h('label',{},'Ваше имя',inp),
     h('p',{class:'hint'},'Вопросы выбираются случайно. Когда время закончится, тест завершится автоматически.'),
-    h('button',{class:'primary',onclick:()=>{const nm=inp.value.trim();if(!nm){inp.focus();return}try{localStorage.setItem('sname',nm)}catch(e){}startQuiz(t,nm)}},'Начать тест')),
-    h('button',{onclick:()=>{location.hash=''}},'Назад'));
+    h('button',{class:'primary big',onclick:startQuiz},'Начать тест')));
 }
 
-function startQuiz(t,name){
-  const qs=shuffle(t.questions).slice(0,QCOUNT).map(q=>({q:q.q,opts:shuffle(q.o.map((x,i)=>({t:x,ok:i===q.a})))}));
-  quiz={active:true,t,name,qs,ans:new Array(qs.length).fill(-1),i:0,left:LIMIT};
+function startQuiz(){
+  const qs=shuffle(bank).slice(0,QCOUNT).map(q=>({q:q.q,opts:shuffle(q.o.map((x,i)=>({t:x,ok:i===q.a})))}));
+  quiz={active:true,qs,ans:new Array(qs.length).fill(-1),i:0,left:LIMIT};
   clearInterval(timer);
   timer=setInterval(()=>{quiz.left--;const e=$('timer');if(e){e.textContent=fmt(quiz.left);e.classList.toggle('low',quiz.left<=60)}if(quiz.left<=0)finish()},1000);
   renderQ();
@@ -177,110 +90,40 @@ function renderQ(){
 }
 
 // ---------- результат ----------
-async function finish(){
+function finish(){
   if(!quiz||!quiz.active)return;
   clearInterval(timer);quiz.active=false;
-  const{qs,ans,t,name}=quiz,spent=LIMIT-Math.max(quiz.left,0);
-  let ok=0,answered=0;const good=[],bad=[];
+  const{qs,ans}=quiz,spent=LIMIT-Math.max(quiz.left,0);
+  let ok=0;const good=[],bad=[];
   qs.forEach((q,n)=>{
     const right=q.opts.find(o=>o.ok).t,has=ans[n]>=0,mine=has?q.opts[ans[n]].t:'нет ответа',g=has&&q.opts[ans[n]].ok;
-    if(has)answered++;if(g)ok++;
+    if(g)ok++;
     (g?good:bad).push(h('div',{class:'item '+(g?'ok':'bad')},h('p',{},(n+1)+'. '+q.q),h('small',{},g?'Ваш ответ: '+mine:'Ваш ответ: '+mine+' · Правильно: '+right)));
   });
   const wrong=qs.length-ok,pct=Math.round(ok/qs.length*100),passed=wrong<=MAX_MISTAKES;
-  const rec={testId:t.id,testTitle:t.title,name,total:qs.length,answered,ok,bad:wrong,pct,passed,time:spent,ts:Date.now()};
-  const status=h('p',{class:'hint'},'Сохраняю результат…');
   mount(h('div',{class:'card'},h('h2',{style:'margin-top:0'},'Результат теста'),
     h('div',{class:'stats'},h('div',{},h('b',{},ok+'/'+qs.length),h('span',{},'Результат')),h('div',{},h('b',{},pct+'%'),h('span',{},'Процент')),h('div',{},h('b',{},fmt(spent)),h('span',{},'Время'))),
     h('p',{},'Правильных ответов: '+ok+' · Неправильных ответов: '+wrong),
-    h('div',{class:'verdict '+(passed?'ok':'bad')},passed?'Тест сдан':'Тест провален: ошибок больше '+MAX_MISTAKES),status),
+    h('div',{class:'verdict '+(passed?'ok':'bad')},passed?'Тест сдан':'Тест провален: ошибок больше '+MAX_MISTAKES)),
     h('h2',{},'Правильные ответы'),good,h('h2',{},'Неправильные ответы'),bad,
-    h('button',{class:'primary',onclick:()=>{quiz=null;location.hash='test-'+t.id;route()}},'Пройти заново'),' ',
-    h('button',{onclick:()=>{quiz=null;location.hash='';route()}},'На главную'));
-  try{await save('results',uid(),rec);status.textContent='Результат сохранён.'}
-  catch(e){status.textContent='Не удалось сохранить результат: у вас нет права записи. Попросите администратора выдать доступ.'}
+    h('button',{class:'primary',onclick:()=>{quiz=null;viewStart()}},'Пройти заново'));
 }
+window.addEventListener('beforeunload',e=>{if(quiz&&quiz.active){e.preventDefault();e.returnValue=''}});
 
-// ---------- админ ----------
-const toText=t=>t.questions.map(q=>[q.q,...q.o,q.a+1].join(' | ')).join('\n');
+// ---------- чтение questions.txt ----------
 function parseQs(txt){
   const out=[];
-  for(const [n,line] of txt.split('\n').map((l,i)=>[i+1,l.trim()]).filter(x=>x[1])){
+  for(const line of txt.split('\n').map(l=>l.trim()).filter(Boolean)){
     const p=line.split('|').map(s=>s.trim()),a=parseInt(p[p.length-1],10),o=p.slice(1,-1);
-    if(p.length<4||o.some(x=>!x)||!(a>=1&&a<=o.length))throw new Error('Строка '+n+': формат «Вопрос | вариант | вариант | … | номер правильного»');
+    if(p.length<4||o.some(x=>!x)||!(a>=1&&a<=o.length))continue;
     out.push({q:p[0],o,a:a-1});
   }
-  if(!out.length)throw new Error('Добавьте хотя бы один вопрос');
   return out;
 }
-function viewAdmin(){
-  const sel=h('select',{},h('option',{value:''},'Все тесты'),allTests().map(t=>h('option',{value:t.id},t.title)));
-  const tbl=h('div',{class:'scroll'});
-  const draw=()=>{
-    const rows=cache.results.filter(r=>!sel.value||r.testId===sel.value).sort((a,b)=>b.ts-a.ts);
-    tbl.replaceChildren(rows.length?h('table',{},h('tr',{},['Студент','Тест','Решено','Верно','Ошибок','Процент','Итог','Время','Дата'].map(x=>h('th',{},x))),
-      rows.map(r=>h('tr',{},h('td',{},r.name),h('td',{},r.testTitle),h('td',{},r.answered+'/'+r.total),h('td',{},String(r.ok)),h('td',{},String(r.bad)),h('td',{},r.pct+'%'),
-        h('td',{class:r.passed?'ok':'bad'},r.passed?'Сдан':'Провал'),h('td',{},fmt(r.time)),h('td',{},new Date(r.ts).toLocaleString('ru-RU')))))
-      :h('p',{class:'hint'},'Результатов пока нет.'));
-  };
-  sel.onchange=draw;draw();
-  const exportBtn=h('button',{onclick:()=>{const rows=cache.results.slice().sort((a,b)=>b.ts-a.ts).map(r=>[r.name,r.testTitle,r.answered,r.ok,r.bad,r.pct,r.passed?'сдан':'провал',fmt(r.time),new Date(r.ts).toLocaleString('ru-RU')].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','));
-    const url=URL.createObjectURL(new Blob(['\ufeffСтудент,Тест,Решено,Верно,Ошибок,Процент,Итог,Время,Дата\n'+rows.join('\n')],{type:'text/csv'}));
-    const a=h('a',{href:url,download:'results.csv'});document.body.append(a);a.click();a.remove()}},'Скачать CSV');
-  mount(h('div',{class:'row sp'},h('h1',{},'Админ-профиль'),h('button',{onclick:()=>{admin=false;if(auth)auth.signOut();if(unsubRes){unsubRes();unsubRes=null}cache.results=fb?[]:cache.results;location.hash='';route()}},'Выйти')),modeNote(),
-    h('h2',{},'Результаты студентов'),h('div',{class:'row'},sel,exportBtn),tbl,
-    h('h2',{},'Страницы с вопросами'),allTests().length?null:h('p',{class:'hint'},'Пока нет ни одной страницы. Создайте первую.'),
-    h('p',{},h('button',{class:'primary',onclick:()=>viewEdit({id:uid(),title:'Новый тест',questions:[]})},'Создать страницу с вопросами')),
-    allTests().map(t=>h('div',{class:'card'},h('div',{class:'row sp'},h('b',{},t.title),h('span',{class:'hint'},t.questions.length+' вопросов в базе')),
-      h('p',{class:'hint'},'Ссылка: '+location.href.split('#')[0]+'#test-'+t.id),
-      h('div',{class:'row'},
-        t.builtin?null:h('button',{onclick:()=>viewEdit(t)},'Изменить'),
-        h('button',{onclick:()=>viewEdit({id:uid(),title:t.title+' (копия)',questions:t.questions})},'Копировать'),
-        t.builtin?null:h('button',{class:'danger',onclick:async()=>{if(confirm('Удалить тест «'+t.title+'»?'))await remove('tests',t.id)}},'Удалить')))));
-}
-function viewEdit(t){
-  const title=h('input',{value:t.title,maxlength:'120'}),ta=h('textarea',{},toText(t)),msg=h('p',{class:'hint'});
-  mount(h('h1',{},'Редактор теста'),h('div',{class:'card'},
-    h('label',{},'Название страницы',title),
-    h('label',{},'Вопросы: по одному в строке',ta),
-    h('p',{class:'hint'},'Формат: Вопрос | вариант 1 | вариант 2 | вариант 3 | вариант 4 | номер правильного (1–4). Студентам случайно выпадает '+QCOUNT+' вопросов из этого списка.'),msg,
-    h('div',{class:'row'},
-      h('button',{class:'primary',onclick:async()=>{
-        try{const qs=parseQs(ta.value),ti=title.value.trim()||'Без названия';
-          await save('tests',t.id,{title:ti,questions:qs});location.hash='admin';route()}
-        catch(e){msg.textContent=e.message;msg.style.color='var(--bad)'}}},'Сохранить'),
-      h('button',{onclick:()=>{location.hash='admin';route()}},'Отмена'))));
-}
-
-// ---------- чтение questions.txt из репозитория ----------
-function parseAny(txt){
-  txt=txt.replace(/^\uFEFF/,'').replace(/\r/g,'');
-  if(txt.includes('|')){try{return parseQs(txt)}catch(e){}}
-  const out=[],lat='abcd',cyr='абвг';
-  for(const blk of txt.split(/\n\s*\n/)){
-    const L=blk.split('\n').map(x=>x.trim()).filter(Boolean);
-    if(L.length<3)continue;
-    const q=L[0].replace(/^\d+[.)]\s*/,''),o=[];let a=-1,key=null;
-    for(const l of L.slice(1)){
-      const m=l.match(/^(?:ответ|answer|правильный ответ)\s*[:\-]\s*(.+)$/i);
-      if(m){key=m[1].trim();continue}
-      let t=l,mark=false;
-      if(/^[*+=✓✔]\s*/.test(t)){mark=true;t=t.replace(/^[*+=✓✔]\s*/,'')}
-      if(/\s*[*✓✔]$/.test(t)){mark=true;t=t.replace(/\s*[*✓✔]$/,'')}
-      t=t.replace(/^[A-Da-dА-Га-г][.)]\s+/,'');
-      o.push(t);if(mark)a=o.length-1;
-    }
-    if(a<0&&key){const c=key[0].toLowerCase();a=lat.indexOf(c);if(a<0)a=cyr.indexOf(c);if(a<0)a=parseInt(key,10)-1}
-    if(o.length>=2&&a>=0&&a<o.length)out.push({q,o,a});
-  }
-  return out;
-}
+viewStart();
 fetch('questions.txt',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{
-  const qs=parseAny(t);if(qs.length){DEFAULT.questions=qs;route()}
-}).catch(()=>{});
-
-route();
-initDb();
+  bank=parseQs(t.replace(/^\uFEFF/,'').replace(/\r/g,''));
+}).catch(()=>{}).finally(()=>{loaded=true;if(!quiz)viewStart()});
 </script>
 </body>
 </html>
