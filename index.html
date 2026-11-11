@@ -72,7 +72,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
 const TITLE='Деньги и Банки', MAX_MISTAKES=3, QCOUNT=30, LIMIT=30*60; // 30 вопросов, 30 минут
 
 const $=id=>document.getElementById(id);
-const h=(t,p,...k)=>{const e=document.createElement(t);for(const x in (p||{})){if(x==='class')e.className=p[x];else if(x.startsWith('on'))e[x]=p[x];else e.setAttribute(x,p[x])}k.flat().forEach(c=>{if(c!=null)e.append(c)});return e};
+// null и false пропускаются: атрибут не создаётся (так кнопка не блокируется по ошибке)
+const h=(t,p,...k)=>{const e=document.createElement(t);for(const x in (p||{})){if(p[x]===null||p[x]===false)continue;if(x==='class')e.className=p[x];else if(x.startsWith('on'))e[x]=p[x];else e.setAttribute(x,p[x])}k.flat().forEach(c=>{if(c!=null)e.append(c)});return e};
 const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};
 const mount=(...n)=>{$('app').replaceChildren(...n.flat().filter(Boolean));window.scrollTo(0,0)};
