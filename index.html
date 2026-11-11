@@ -5,71 +5,75 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Тест — Деньги и Банки</title>
 <style>
-:root{--bg:#eef3f1;--card:#ffffff;--ink:#10272a;--mute:#5a6e70;--line:#d3dedb;--acc:#0f766e;--acc-ink:#fff;--ok:#157347;--okbg:#e1f4ea;--bad:#b3322b;--badbg:#fbe5e3;--sel:#e2f1ee;--g1:#b7e4da;--g2:#c9d8ff;--g3:#ffe7c2;--shadow:0 12px 32px rgba(16,39,42,.10);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1517;--card:#13242a;--ink:#e7f1ef;--mute:#98b0ae;--line:#25393e;--acc:#3fc1b0;--acc-ink:#04201c;--ok:#6fd49a;--okbg:#12352a;--bad:#ff8d85;--badbg:#3a1d1b;--sel:#1b3a3c;--g1:#0f4a45;--g2:#1c2f66;--g3:#4a3414;--shadow:0 12px 32px rgba(0,0,0,.35);color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0b1517;--card:#13242a;--ink:#e7f1ef;--mute:#98b0ae;--line:#25393e;--acc:#3fc1b0;--acc-ink:#04201c;--ok:#6fd49a;--okbg:#12352a;--bad:#ff8d85;--badbg:#3a1d1b;--sel:#1b3a3c;--g1:#0f4a45;--g2:#1c2f66;--g3:#4a3414;--shadow:0 12px 32px rgba(0,0,0,.35);color-scheme:dark}
+:root{--bg:#f3f7ff;--card:#ffffff;--ink:#0f1b3d;--mute:#51618a;--line:#cfdaf5;--acc:#2563eb;--acc2:#7c3aed;--ok:#0f9d4a;--okbg:#d4f8e2;--bad:#e11d48;--badbg:#ffdde5;--sel:#e0eaff;--g1:#7ddcff;--g2:#c3a6ff;--g3:#ffd98a;--shadow:0 14px 36px rgba(37,99,235,.18);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a0f24;--card:#141b3a;--ink:#f1f5ff;--mute:#a9b7e0;--line:#2c3866;--acc:#4f8bff;--acc2:#9d6bff;--ok:#4ade80;--okbg:#0f3d27;--bad:#ff6b8a;--badbg:#4a1526;--sel:#212c5c;--g1:#0e7fb0;--g2:#6d3fd6;--g3:#b86a12;--shadow:0 14px 36px rgba(0,0,0,.45);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0a0f24;--card:#141b3a;--ink:#f1f5ff;--mute:#a9b7e0;--line:#2c3866;--acc:#4f8bff;--acc2:#9d6bff;--ok:#4ade80;--okbg:#0f3d27;--bad:#ff6b8a;--badbg:#4a1526;--sel:#212c5c;--g1:#0e7fb0;--g2:#6d3fd6;--g3:#b86a12;--shadow:0 14px 36px rgba(0,0,0,.45);color-scheme:dark}
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
-body{margin:0;min-height:100%;color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:radial-gradient(800px 520px at 6% -8%,var(--g1),transparent 60%),radial-gradient(760px 520px at 102% 2%,var(--g2),transparent 58%),radial-gradient(700px 480px at 50% 112%,var(--g3),transparent 60%),var(--bg);background-attachment:fixed}
+body{margin:0;min-height:100%;color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:radial-gradient(820px 540px at 4% -8%,var(--g1),transparent 62%),radial-gradient(780px 540px at 104% 0%,var(--g2),transparent 60%),radial-gradient(720px 500px at 50% 114%,var(--g3),transparent 62%),var(--bg);background-attachment:fixed}
 main{max-width:900px;margin:0 auto;padding:28px 16px 56px}
-h1{font-size:1.9rem;line-height:1.2;margin:0 0 18px;letter-spacing:-.02em;font-weight:750}
-h2{font-size:1.15rem;margin:26px 0 10px;font-weight:700}
-.card{background:color-mix(in srgb,var(--card) 80%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid color-mix(in srgb,var(--line) 75%,transparent);border-radius:18px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow)}
-button{font:inherit;color:var(--ink);cursor:pointer;border-radius:12px;border:1px solid var(--line);background:color-mix(in srgb,var(--card) 88%,transparent);padding:11px 18px;transition:transform .12s,box-shadow .12s,border-color .12s}
-button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.10);border-color:var(--acc)}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 18px;letter-spacing:-.02em;font-weight:800;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:1.15rem;margin:26px 0 10px;font-weight:750}
+.card{background:color-mix(in srgb,var(--card) 84%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);border:1px solid color-mix(in srgb,var(--acc) 22%,var(--line));border-radius:20px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow)}
+button{font:inherit;color:var(--ink);cursor:pointer;border-radius:14px;border:1.5px solid var(--line);background:color-mix(in srgb,var(--card) 92%,transparent);padding:11px 18px;transition:transform .12s,box-shadow .12s,border-color .12s}
+button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 20px rgba(37,99,235,.20);border-color:var(--acc)}
 button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-button.primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:700}
-button.big{width:100%;padding:15px 18px;font-size:1.1rem}
-button:disabled{opacity:.4;cursor:not-allowed}
-.hint{color:var(--mute);font-size:.92rem}
+button.primary{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border-color:transparent;font-weight:750;box-shadow:0 8px 20px rgba(79,70,229,.35)}
+button.primary:hover:not(:disabled){border-color:transparent;box-shadow:0 10px 26px rgba(79,70,229,.5)}
+button.big{width:100%;padding:16px 18px;font-size:1.12rem}
+button:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.hint{color:var(--mute);font-size:.94rem}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 16px}
-.chips span{background:var(--sel);border-radius:999px;padding:6px 14px;font-size:.92rem;font-weight:600}
+.chips span{background:linear-gradient(135deg,color-mix(in srgb,var(--acc) 18%,transparent),color-mix(in srgb,var(--acc2) 18%,transparent));border:1px solid color-mix(in srgb,var(--acc) 35%,transparent);border-radius:999px;padding:6px 14px;font-size:.92rem;font-weight:650}
 .layout{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:16px;align-items:start}
 .side{position:sticky;top:16px}
 .side .card{padding:16px}
 @media (max-width:720px){.layout{grid-template-columns:1fr}.side{position:static;order:-1}}
-.timer{display:block;text-align:center;font-variant-numeric:tabular-nums;font-weight:750;font-size:1.4rem;color:var(--ink);background:var(--sel);padding:6px 14px;border-radius:12px;margin-bottom:12px}
-.timer.low{color:var(--bad);background:var(--badbg)}
+.timer{display:block;text-align:center;font-variant-numeric:tabular-nums;font-weight:800;font-size:1.45rem;color:#fff;background:linear-gradient(135deg,var(--acc),var(--acc2));padding:7px 14px;border-radius:14px;margin-bottom:12px}
+.timer.low{background:linear-gradient(135deg,#ff3b5c,#ff7a3b)}
+.errs{text-align:center;font-weight:700;font-size:.9rem;margin:-2px 0 12px;color:var(--mute)}
+.errs.hot{color:var(--bad)}
 .nums{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
 @media (min-width:721px){.nums{grid-template-columns:repeat(5,1fr)}}
-.nums button{padding:8px 0;border-radius:10px;font-weight:650;font-variant-numeric:tabular-nums;font-size:.92rem}
-.nums button.has{background:var(--sel);border-color:var(--acc)}
-.nums button.r{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
-.nums button.w{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
-.nums button.cur{outline:3px solid var(--acc);outline-offset:1px}
+.nums button{padding:8px 0;border-radius:10px;font-weight:700;font-variant-numeric:tabular-nums;font-size:.92rem}
+.nums button.has{background:var(--sel);border-color:var(--acc);color:var(--acc)}
+.nums button.r{background:var(--ok);border-color:var(--ok);color:#fff}
+.nums button.w{background:var(--bad);border-color:var(--bad);color:#fff}
+.nums button.cur{outline:3px solid var(--acc2);outline-offset:1px}
 .legend{margin:10px 0 12px;font-size:.8rem;color:var(--mute)}
-.cnt{color:var(--mute);margin:0 0 10px}
-.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-bottom:20px}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),color-mix(in srgb,var(--acc) 55%,#6aa0ff));transition:width .25s}
-.q{font-size:1.25rem;line-height:1.4;margin:0 0 18px;font-weight:650}
-.opt{display:block;width:100%;text-align:left;margin-bottom:10px;padding:13px 16px}
-.opt.sel{background:var(--sel);border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
+.cnt{color:var(--mute);margin:0 0 10px;font-weight:600}
+.bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin-bottom:20px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .25s}
+.q{font-size:1.3rem;line-height:1.4;margin:0 0 18px;font-weight:700}
+.opt{display:block;width:100%;text-align:left;margin-bottom:10px;padding:14px 16px}
+.opt.sel{background:var(--sel);border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc);font-weight:650}
 .opt.locked{cursor:default}
 .opt.locked:hover{transform:none;box-shadow:none;border-color:var(--line)}
-.opt.right,.opt.right:hover{background:var(--okbg);border-color:var(--ok);color:var(--ok);font-weight:650}
-.opt.wrong,.opt.wrong:hover{background:var(--badbg);border-color:var(--bad);color:var(--bad);font-weight:650}
-.fb{margin:6px 0 0;padding:12px 14px;border-radius:12px;font-weight:650}
+.opt.right,.opt.right:hover{background:var(--okbg);border-color:var(--ok);color:var(--ok);font-weight:700}
+.opt.wrong,.opt.wrong:hover{background:var(--badbg);border-color:var(--bad);color:var(--bad);font-weight:700}
+.fb{margin:6px 0 0;padding:13px 15px;border-radius:14px;font-weight:700}
 .fb.ok{background:var(--okbg);color:var(--ok)}.fb.bad{background:var(--badbg);color:var(--bad)}
+.fb .stop{display:block;margin-top:6px}
 .nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
-.stats div{background:var(--sel);border-radius:14px;padding:14px 6px}
-.stats b{display:block;font-size:1.6rem;font-weight:750}
+.stats div{background:linear-gradient(135deg,color-mix(in srgb,var(--acc) 16%,transparent),color-mix(in srgb,var(--acc2) 16%,transparent));border-radius:16px;padding:14px 6px}
+.stats b{display:block;font-size:1.7rem;font-weight:800}
 .stats span{color:var(--mute);font-size:.85rem}
-.verdict{margin-top:14px;padding:13px;border-radius:12px;font-weight:700;font-size:1.05rem;text-align:center}
-.verdict.ok{background:var(--okbg);color:var(--ok)}.verdict.bad{background:var(--badbg);color:var(--bad)}
-.item{border-left:4px solid var(--line);padding:10px 14px;margin-bottom:10px;border-radius:0 12px 12px 0}
+.verdict{margin-top:14px;padding:14px;border-radius:14px;font-weight:800;font-size:1.08rem;text-align:center}
+.verdict.ok{background:var(--ok);color:#fff}.verdict.bad{background:var(--bad);color:#fff}
+.item{border-left:5px solid var(--line);padding:10px 14px;margin-bottom:10px;border-radius:0 14px 14px 0}
 .item.ok{border-color:var(--ok);background:var(--okbg)}.item.bad{border-color:var(--bad);background:var(--badbg)}
-.item p{margin:0 0 6px;font-weight:600}.item small{display:block;color:var(--mute)}
-.tag{display:inline-block;margin-bottom:6px;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:750;color:#fff}
+.item p{margin:0 0 6px;font-weight:650}.item small{display:block;color:var(--mute)}
+.tag{display:inline-block;margin-bottom:6px;padding:2px 11px;border-radius:999px;font-size:.8rem;font-weight:800;color:#fff}
 .item.ok .tag{background:var(--ok)}.item.bad .tag{background:var(--bad)}
-@media (prefers-color-scheme:dark){.tag{color:#04201c}}
+@media (prefers-color-scheme:dark){.item.ok .tag,.nums button.r,.verdict.ok{color:#05210f}.item.bad .tag,.nums button.w,.verdict.bad{color:#2a0610}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <main id="app"></main>
 <script>
-const TITLE='Деньги и Банки', MAX_MISTAKES=3, QCOUNT=30, LIMIT=30*60; // 30 вопросов, 30 минут
+const TITLE='Деньги и Банки', MAX_MISTAKES=3, QCOUNT=30, LIMIT=30*60; // 30 вопросов, 30 минут, тест прекращается после 4-й ошибки
 
 const $=id=>document.getElementById(id);
 // null и false пропускаются: атрибут не создаётся (так кнопка не блокируется по ошибке)
@@ -87,7 +91,7 @@ function viewStart(){
   const n=Math.min(QCOUNT,bank.length);
   mount(h('h1',{},TITLE),h('div',{class:'card'},
     h('div',{class:'chips'},h('span',{},n+' вопросов'),h('span',{},'30 минут'),h('span',{},'не более '+MAX_MISTAKES+' ошибок')),
-    h('p',{class:'hint'},'Выберите вариант и нажмите «Далее»: сразу увидите, верно ли ответили. Пока не нажали «Далее», ответ можно изменить. Номера вопросов справа помогут перейти к любому из них.'),
+    h('p',{class:'hint'},'Выберите вариант и нажмите «Далее»: сразу увидите, верно ли ответили. Пока не нажали «Далее», ответ можно изменить. Если сделать больше '+MAX_MISTAKES+' ошибок, тест сразу заканчивается и считается не сданным.'),
     h('button',{class:'primary big',onclick:startQuiz},'Начать тест')));
 }
 
@@ -99,25 +103,31 @@ function startQuiz(){
   renderQ();
 }
 
+// число проверенных неверных ответов
+const mistakes=()=>quiz.qs.filter((x,n)=>quiz.done[n]&&!(quiz.ans[n]>=0&&x.opts[quiz.ans[n]].ok)).length;
+
 function renderQ(){
   const{qs,i,ans,done}=quiz,q=qs[i],last=i===qs.length-1,isDone=done[i];
   const right=q.opts.find(o=>o.ok).t,good=isDone&&ans[i]>=0&&q.opts[ans[i]].ok;
+  const wrongNow=mistakes(),over=wrongNow>MAX_MISTAKES;
 
   const nums=qs.map((_,n)=>{
     let c='';
     if(done[n])c=(ans[n]>=0&&qs[n].opts[ans[n]].ok)?'r':'w';else if(ans[n]>=0)c='has';
     if(n===i)c+=' cur';
-    return h('button',{class:c.trim(),title:'Вопрос '+(n+1),onclick:()=>{quiz.i=n;renderQ()}},String(n+1));
+    return h('button',{class:c.trim(),title:'Вопрос '+(n+1),onclick:()=>{if(over){finish();return}quiz.i=n;renderQ()}},String(n+1));
   });
   const side=h('div',{class:'side'},h('div',{class:'card'},
     h('span',{class:'timer'+(quiz.left<=60?' low':''),id:'timer'},fmt(quiz.left)),
+    h('div',{class:'errs'+(wrongNow>=MAX_MISTAKES?' hot':'')},'Ошибок: '+wrongNow+' из '+MAX_MISTAKES+' допустимых'),
     h('div',{class:'nums'},nums),
     h('p',{class:'legend'},'Зелёный: верно · Красный: неверно · Закрашен: выбран ответ'),
     h('button',{style:'width:100%',onclick:()=>{
       const left=qs.filter((_,n)=>!done[n]).length;
-      if(left===0||confirm('Не проверено вопросов: '+left+'. Завершить тест?'))finish();
+      if(over||left===0||confirm('Не проверено вопросов: '+left+'. Завершить тест?'))finish();
     }},'Завершить тест')));
 
+  const fbText=(good?'Верно!':(ans[i]<0?'Ответа нет. ':'Неверно. ')+'Правильный ответ: '+right);
   const main=h('div',{},h('div',{class:'card'},
     h('p',{class:'cnt'},'Вопрос '+(i+1)+' из '+qs.length),
     h('div',{class:'bar'},h('i',{style:'width:'+((i+1)/qs.length*100)+'%'})),
@@ -128,11 +138,11 @@ function renderQ(){
       else if(ans[i]===k)c+=' sel';
       return h('button',{class:c,onclick:()=>{if(quiz.done[i])return;quiz.ans[i]=k;renderQ()}},o.t);
     }),
-    isDone?h('div',{class:'fb '+(good?'ok':'bad')},good?'Верно!':(ans[i]<0?'Ответа нет. ':'Неверно. ')+'Правильный ответ: '+right):null,
+    isDone?h('div',{class:'fb '+(good?'ok':'bad')},fbText,over?h('span',{class:'stop'},'Ошибок больше '+MAX_MISTAKES+': тест не сдан и закончен.'):null):null,
     h('div',{class:'nav'},
-      h('button',{disabled:i===0?'':null,onclick:()=>{if(quiz.i>0){quiz.i--;renderQ()}}},'Назад'),
+      h('button',{disabled:i===0?'':null,onclick:()=>{if(over){finish();return}if(quiz.i>0){quiz.i--;renderQ()}}},'Назад'),
       isDone
-        ?h('button',{class:'primary',onclick:()=>{last?finish():(quiz.i++,renderQ())}},last?'Завершить':'Следующий вопрос')
+        ?h('button',{class:'primary',onclick:()=>{(last||over)?finish():(quiz.i++,renderQ())}},over?'Показать результат':last?'Завершить':'Следующий вопрос')
         :h('button',{class:'primary',disabled:ans[i]<0?'':null,onclick:()=>{if(quiz.ans[i]<0)return;quiz.done[i]=true;renderQ()}},'Далее'))));
 
   mount(h('div',{class:'layout'},main,side));
@@ -157,7 +167,7 @@ function finish(){
   mount(h('div',{class:'card'},h('h2',{style:'margin-top:0'},'Результат теста'),
     h('div',{class:'stats'},h('div',{},h('b',{},ok+'/'+qs.length),h('span',{},'Результат')),h('div',{},h('b',{},pct+'%'),h('span',{},'Процент')),h('div',{},h('b',{},fmt(spent)),h('span',{},'Время'))),
     h('p',{},'Правильных ответов: '+ok+' · Неправильных ответов: '+wrong),
-    h('div',{class:'verdict '+(passed?'ok':'bad')},passed?'Тест сдан':'Тест провален: ошибок больше '+MAX_MISTAKES)),
+    h('div',{class:'verdict '+(passed?'ok':'bad')},passed?'Тест сдан':'Тест не сдан: ошибок больше '+MAX_MISTAKES)),
     h('h2',{},'Разбор всех вопросов'),items,
     h('button',{class:'primary',onclick:()=>{quiz=null;viewStart()}},'Пройти заново'));
 }
