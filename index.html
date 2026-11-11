@@ -53,4 +53,131 @@ button:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
 .fb.ok{background:var(--okbg);color:var(--ok)}.fb.bad{background:var(--badbg);color:var(--bad)}
 .nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
-.stats div{background:linear-gradient(135deg,color-mix(in srgb,var(--acc) 16%,transparent),color-mix(in srgb,var(--acc2)
+.stats div{background:linear-gradient(135deg,color-mix(in srgb,var(--acc) 16%,transparent),color-mix(in srgb,var(--acc2) 16%,transparent));border-radius:16px;padding:14px 6px}
+.stats b{display:block;font-size:1.7rem;font-weight:800}
+.stats span{color:var(--mute);font-size:.85rem}
+.verdict{margin-top:14px;padding:14px;border-radius:14px;font-weight:800;font-size:1.08rem;text-align:center}
+.verdict.ok{background:var(--ok);color:#fff}.verdict.bad{background:var(--bad);color:#fff}
+.item{border-left:5px solid var(--line);padding:10px 14px;margin-bottom:10px;border-radius:0 14px 14px 0}
+.item.ok{border-color:var(--ok);background:var(--okbg)}.item.bad{border-color:var(--bad);background:var(--badbg)}
+.item p{margin:0 0 6px;font-weight:650}.item small{display:block;color:var(--mute)}
+.tag{display:inline-block;margin-bottom:6px;padding:2px 11px;border-radius:999px;font-size:.8rem;font-weight:800;color:#fff}
+.item.ok .tag{background:var(--ok)}.item.bad .tag{background:var(--bad)}
+@media (prefers-color-scheme:dark){.item.ok .tag,.nums button.r,.verdict.ok{color:#05210f}.item.bad .tag,.nums button.w,.verdict.bad{color:#2a0610}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+const TITLE='Деньги и Банки', MAX_MISTAKES=3, QCOUNT=30, LIMIT=30*60; // 30 вопросов, 30 минут, допустимо 3 ошибки
+
+const $=id=>document.getElementById(id);
+// null и false пропускаются: атрибут не создаётся (так кнопка не блокируется по ошибке)
+const h=(t,p,...k)=>{const e=document.createElement(t);for(const x in (p||{})){if(p[x]===null||p[x]===false)continue;if(x==='class')e.className=p[x];else if(x.startsWith('on'))e[x]=p[x];else e.setAttribute(x,p[x])}k.flat().forEach(c=>{if(c!=null)e.append(c)});return e};
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};
+const mount=(...n)=>{$('app').replaceChildren(...n.flat().filter(Boolean));window.scrollTo(0,0)};
+
+let bank=[],loaded=false,quiz=null,timer=null;
+
+// ---------- старт ----------
+function viewStart(){
+  if(!loaded)return mount(h('h1',{},TITLE),h('p',{class:'hint'},'Загружаю вопросы…'));
+  if(!bank.length)return mount(h('h1',{},TITLE),h('div',{class:'card'},h('p',{},'Не удалось загрузить вопросы. Проверьте, что файл questions.txt лежит рядом с index.html.')));
+  const n=Math.min(QCOUNT,bank.length);
+  mount(h('h1',{},TITLE),h('div',{class:'card'},
+    h('div',{class:'chips'},h('span',{},n+' вопросов'),h('span',{},'30 минут'),h('span',{},'Допустимо ошибок: '+MAX_MISTAKES)),
+    h('p',{class:'hint'},'Выберите вариант и нажмите «Далее»: сразу увидите, верно ли ответили. Пока не нажали «Далее», ответ можно изменить. Номера вопросов справа помогут перейти к любому из них.'),
+    h('button',{class:'primary big',onclick:startQuiz},'Начать тест')));
+}
+
+function startQuiz(){
+  const qs=shuffle(bank).slice(0,QCOUNT).map(q=>({q:q.q,opts:shuffle(q.o.map((x,i)=>({t:x,ok:i===q.a})))}));
+  quiz={active:true,qs,ans:new Array(qs.length).fill(-1),done:new Array(qs.length).fill(false),i:0,left:LIMIT};
+  clearInterval(timer);
+  timer=setInterval(()=>{quiz.left--;const e=$('timer');if(e){e.textContent=fmt(quiz.left);e.classList.toggle('low',quiz.left<=60)}if(quiz.left<=0)finish()},1000);
+  renderQ();
+}
+
+function renderQ(){
+  const{qs,i,ans,done}=quiz,q=qs[i],last=i===qs.length-1,isDone=done[i];
+  const right=q.opts.find(o=>o.ok).t,good=isDone&&ans[i]>=0&&q.opts[ans[i]].ok;
+
+  const nums=qs.map((_,n)=>{
+    let c='';
+    if(done[n])c=(ans[n]>=0&&qs[n].opts[ans[n]].ok)?'r':'w';else if(ans[n]>=0)c='has';
+    if(n===i)c+=' cur';
+    return h('button',{class:c.trim(),title:'Вопрос '+(n+1),onclick:()=>{quiz.i=n;renderQ()}},String(n+1));
+  });
+  const side=h('div',{class:'side'},h('div',{class:'card'},
+    h('span',{class:'timer'+(quiz.left<=60?' low':''),id:'timer'},fmt(quiz.left)),
+    h('div',{class:'nums'},nums),
+    h('p',{class:'legend'},'Зелёный: верно · Красный: неверно · Закрашен: выбран ответ'),
+    h('button',{style:'width:100%',onclick:()=>{
+      const left=qs.filter((_,n)=>!done[n]).length;
+      if(left===0||confirm('Не проверено вопросов: '+left+'. Завершить тест?'))finish();
+    }},'Завершить тест')));
+
+  const main=h('div',{},h('div',{class:'card'},
+    h('p',{class:'cnt'},'Вопрос '+(i+1)+' из '+qs.length),
+    h('div',{class:'bar'},h('i',{style:'width:'+((i+1)/qs.length*100)+'%'})),
+    h('p',{class:'q'},q.q),
+    q.opts.map((o,k)=>{
+      let c='opt';
+      if(isDone){c+=' locked';if(o.ok)c+=' right';else if(ans[i]===k)c+=' wrong'}
+      else if(ans[i]===k)c+=' sel';
+      return h('button',{class:c,onclick:()=>{if(quiz.done[i])return;quiz.ans[i]=k;renderQ()}},o.t);
+    }),
+    isDone?h('div',{class:'fb '+(good?'ok':'bad')},good?'Верно!':(ans[i]<0?'Ответа нет. ':'Неверно. ')+'Правильный ответ: '+right):null,
+    h('div',{class:'nav'},
+      h('button',{disabled:i===0?'':null,onclick:()=>{if(quiz.i>0){quiz.i--;renderQ()}}},'Назад'),
+      isDone
+        ?h('button',{class:'primary',onclick:()=>{last?finish():(quiz.i++,renderQ())}},last?'Завершить':'Следующий вопрос')
+        :h('button',{class:'primary',disabled:ans[i]<0?'':null,onclick:()=>{if(quiz.ans[i]<0)return;quiz.done[i]=true;renderQ()}},'Далее'))));
+
+  mount(h('div',{class:'layout'},main,side));
+}
+
+// ---------- результат ----------
+function finish(){
+  if(!quiz||!quiz.active)return;
+  clearInterval(timer);quiz.active=false;
+  const{qs,ans}=quiz,spent=LIMIT-Math.max(quiz.left,0);
+  let ok=0;const items=[];
+  qs.forEach((q,n)=>{
+    const right=q.opts.find(o=>o.ok).t,has=ans[n]>=0,mine=has?q.opts[ans[n]].t:'нет ответа',g=has&&q.opts[ans[n]].ok;
+    if(g)ok++;
+    items.push(h('div',{class:'item '+(g?'ok':'bad')},
+      h('span',{class:'tag'},g?'Верно':'Неверно'),
+      h('p',{},(n+1)+'. '+q.q),
+      h('small',{},'Ваш ответ: '+mine),
+      g?null:h('small',{},'Правильный ответ: '+right)));
+  });
+  const wrong=qs.length-ok,pct=Math.round(ok/qs.length*100),passed=wrong<=MAX_MISTAKES;
+  mount(h('div',{class:'card'},h('h2',{style:'margin-top:0'},'Результат теста'),
+    h('div',{class:'stats'},h('div',{},h('b',{},ok+'/'+qs.length),h('span',{},'Результат')),h('div',{},h('b',{},pct+'%'),h('span',{},'Процент')),h('div',{},h('b',{},fmt(spent)),h('span',{},'Время'))),
+    h('p',{},'Правильных ответов: '+ok+' · Неправильных ответов: '+wrong),
+    h('div',{class:'verdict '+(passed?'ok':'bad')},passed?'Тест сдан':'Тест провален: ошибок больше '+MAX_MISTAKES)),
+    h('h2',{},'Разбор всех вопросов'),items,
+    h('button',{class:'primary',onclick:()=>{quiz=null;viewStart()}},'Пройти заново'));
+}
+window.addEventListener('beforeunload',e=>{if(quiz&&quiz.active){e.preventDefault();e.returnValue=''}});
+
+// ---------- чтение questions.txt ----------
+function parseQs(txt){
+  const out=[];
+  for(const line of txt.split('\n').map(l=>l.trim()).filter(Boolean)){
+    const p=line.split('|').map(s=>s.trim()),a=parseInt(p[p.length-1],10),o=p.slice(1,-1);
+    if(p.length<4||o.some(x=>!x)||!(a>=1&&a<=o.length))continue;
+    out.push({q:p[0],o,a:a-1});
+  }
+  return out;
+}
+viewStart();
+fetch('questions.txt',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{
+  bank=parseQs(t.replace(/^\uFEFF/,'').replace(/\r/g,''));
+}).catch(()=>{}).finally(()=>{loaded=true;if(!quiz)viewStart()});
+</script>
+</body>
+</html>
