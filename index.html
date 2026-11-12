@@ -201,3 +201,15 @@ function parseQs(txt){
   const out=[];
   for(const line of txt.split('\n').map(l=>l.trim()).filter(Boolean)){
     const p=line.split('|').map(s=>s.trim()),a=parseInt(p[p.length-1],10),o=p.slice(1,-1);
+    if(p.length<4||o.some(x=>!x)||!(a>=1&&a<=o.length))continue;
+    out.push({q:p[0],o,a:a-1});
+  }
+  return out;
+}
+viewStart();
+fetch('questions.txt',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{
+  bank=parseQs(t.replace(/^\uFEFF/,'').replace(/\r/g,''));
+}).catch(()=>{}).finally(()=>{loaded=true;if(!quiz)viewStart()});
+</script>
+</body>
+</html>
