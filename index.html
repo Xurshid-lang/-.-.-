@@ -82,7 +82,7 @@ input.name:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 <body>
 <main id="app"></main>
 <script>
-const TITLE='Деньги и Банки', MAX_MISTAKES=10, QCOUNT=25, LIMIT=30*60; // 25 вопросов, 30 минут, Удачи 
+const TITLE='Деньги и Банки', MIN_CORRECT=15, QCOUNT=25, LIMIT=30*60; // 25 вопросов, 30 минут, для сдачи нужно минимум 15 правильных
 const SHEET_URL='https://script.google.com/macros/s/AKfycbw4QsVxL7WNucx3nUm_bjENSvZUNEIM8ZBFaekDlb27Aqc8YMNczyzrRitYGoZ4SNiE/exec'; // ссылка веб-приложения Google Apps Script
 
 const $=id=>document.getElementById(id);
@@ -206,12 +206,12 @@ function finish(){
       h('small',{},'Ваш ответ: '+mine),
       g?null:h('small',{},'Правильный ответ: '+right)));
   });
-  const wrong=qs.length-ok,pct=Math.round(ok/qs.length*100),passed=wrong<=MAX_MISTAKES;
+  const wrong=qs.length-ok,pct=Math.round(ok/qs.length*100),passed=ok>=MIN_CORRECT;
   sendResult({name:quiz.name,ok,wrong,total:qs.length,pct,passed,time:fmt(spent)});
   mount(h('div',{class:'card'},h('h2',{style:'margin-top:0'},'Результат теста'),
     h('div',{class:'stats'},h('div',{},h('b',{},ok+'/'+qs.length),h('span',{},'Результат')),h('div',{},h('b',{},pct+'%'),h('span',{},'Процент')),h('div',{},h('b',{},fmt(spent)),h('span',{},'Время'))),
     h('p',{},'Правильных ответов: '+ok+' · Неправильных ответов: '+wrong),
-    h('div',{class:'verdict '+(passed?'ok':'bad')},passed?'Тест сдан':'Тест не сдан: нужно минимум '+MIN_CORRECT+' правильных ответов' ),
+    h('div',{class:'verdict '+(passed?'ok':'bad')},passed?'Тест сдан':'Тест не сдан: нужно минимум '+MIN_CORRECT+' правильных ответов')),
     h('h2',{},'Разбор всех вопросов'),items,
     h('button',{class:'primary',onclick:()=>{quiz=null;viewStart()}},'Пройти заново'));
 }
