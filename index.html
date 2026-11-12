@@ -100,6 +100,27 @@ function sendResult(r){
   try{fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(r)}).catch(()=>{})}catch(e){}
 }
 
+// выбор вопросов: сначала те, что студент ещё не видел
+function pickQuestions(){
+  const key=q=>q.q.toLowerCase();
+  const uniq=[...new Map(bank.map(q=>[key(q),q])).values()]; // без дублей
+  let seen=new Set();
+  try{seen=new Set(JSON.parse(localStorage.getItem('seenQ')||'[]'))}catch(e){}
+  const fresh=uniq.filter(q=>!seen.has(key(q)));
+  let pick;
+  if(fresh.length>=QCOUNT){
+    pick=shuffle(fresh).slice(0,QCOUNT);
+  }else{
+    // новые закончились: берём все оставшиеся и добираем из уже виденных, начинаем новый круг
+    const rest=shuffle(uniq.filter(q=>seen.has(key(q)))).slice(0,QCOUNT-fresh.length);
+    pick=shuffle([...fresh,...rest]);
+    seen=new Set();
+  }
+  pick.forEach(q=>seen.add(key(q)));
+  try{localStorage.setItem('seenQ',JSON.stringify([...seen]))}catch(e){}
+  return pick;
+}
+
 // ---------- старт ----------
 function viewStart(){
   if(!loaded)return mount(h('h1',{},TITLE),h('p',{class:'hint'},'Загружаю вопросы…'));
@@ -117,7 +138,7 @@ function viewStart(){
 }
 
 function startQuiz(name){
-  const qs=shuffle(bank).slice(0,QCOUNT).map(q=>({q:q.q,opts:shuffle(q.o.map((x,i)=>({t:x,ok:i===q.a})))}));
+  const qs=pickQuestions().map(q=>({q:q.q,opts:shuffle(q.o.map((x,i)=>({t:x,ok:i===q.a})))}));
   quiz={active:true,name,qs,ans:new Array(qs.length).fill(-1),done:new Array(qs.length).fill(false),i:0,left:LIMIT};
   clearInterval(timer);
   timer=setInterval(()=>{
